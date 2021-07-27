@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None
 import matplotlib.pyplot as plt
-import seaborn as sns
 from flask_googlecharts import GoogleCharts
 import io
 import base64
@@ -21,10 +20,14 @@ dataframe_2016 = dataframe[dataframe["year"]==2016]
 dataframe_2017 = dataframe[dataframe["year"]==2017]
 
 mean_2015 = dataframe_2015['net_revenue'].mean()
-mean_2016 = dataframe_2016['net_revenue'].mean()
-mean_2017 = dataframe_2017['net_revenue'].mean()
+median_2015 = dataframe_2015['net_revenue'].mean()
 
-#print(str(mean_2015)+ str(mean_2016) + str(mean_2017))
+mean_2016 = dataframe_2016['net_revenue'].mean()
+median_2016 = dataframe_2015['net_revenue'].median()
+
+mean_2017 = dataframe_2017['net_revenue'].mean()
+median_2017 = dataframe_2015['net_revenue'].median()
+
 
 def get_total_revenue(year):
     filtered_data = dataframe[dataframe["year"] == year]
@@ -43,13 +46,13 @@ new_customers_2016_17 = dataframe_2016_17.drop_duplicates(subset=['customer_emai
 
 # save new and lost customers in global variables to access later
 # from the combined 2015 and 2016 with out duplicates, do minus the customers from previous year to get new customers
-new_customers_count_2016 = len(new_customers_2015_16.index) - len(dataframe_2015.index)
+new_customers_count_2016 = (len(dataframe_2016.index) - len(dataframe_2015))
 # from the same combined dataset, do minus customers from current year to get lost customers
-lost_customers_count_2016 = len(new_customers_2015_16.index) - len(dataframe_2016.index)
+lost_customers_count_2016 = (len(dataframe_2015.index) - len(dataframe_2016))
 
 #do the same from 2016 to 2017
-new_customers_count_2017 = len(new_customers_2016_17.index) - len(dataframe_2016.index)
-lost_customers_count_2017 = len(new_customers_2016_17.index) - len(dataframe_2017.index)
+new_customers_count_2017 = (len(dataframe_2016.index) + len(dataframe_2017)) + (len(new_customers_2016_17.index) - len(dataframe_2016.index))
+lost_customers_count_2017 = (len(dataframe_2016.index) + len(dataframe_2017)) + (len(new_customers_2016_17.index) - len(dataframe_2017.index))
 
 new_customers_2015_16.drop(new_customers_2015_16.loc[new_customers_2015_16['year']==2015].index, inplace=True)
 new_customers_2016_17.drop(new_customers_2016_17.loc[new_customers_2016_17['year']==2016].index, inplace=True)
@@ -100,6 +103,7 @@ def year2016():
     total_customer_previous_year = len(dataframe_2015.index)
     # total new customers and lost customers called from the global variables
 
+
     out = "\nTotal Revenue : " + str(total_revenue_2016) + "\nRevenue from new Customers : " + str(new_customers_revenue_2016) + "\nExisting customer growth : " + str(existing_customer_growth_2017) + "\nRevenue Lost from Attrition : " + str(lost_revenue_attrition) + "\nExisting Customer Revenue Current Year : " + str(customer_revenue_current) + "\nExisting Customer Revenue Prior Year :" + str(customer_revenue_prior)+ "\nTotal Customers Current Year : " + str(total_customer_current_year) + "\nTotal Customers Previous Year : " + str(total_customer_previous_year) + "\nNew Customers : " + str(new_customers_count_2016) + "\nLost Customers : " + str(lost_customers_count_2016)
 
     return "<xmp>"  "\n" + "FY 2016 : \n" + out + "\n" + " </xmp> "
@@ -148,10 +152,7 @@ def piechart():
             shadow=True, startangle=90)
     ax1.axis('equal')
 
-    # y = np.array([get_total_revenue(2015)/total, get_total_revenue(2016)/total,get_total_revenue(2017)/total])
-    # mylabels = ["2015", "2016", "2017"]
-    # plt.pie(y, labels=mylabels)
-    plt.title("Yearly Revenue Composition")
+    plt.title("Pie Chart : Yearly Revenue Composition")
     plt.savefig(img, format='png')
     img.seek(0)
 
@@ -175,7 +176,7 @@ def bargraph():
     plt.barh(year, customers, color='maroon',align='center', height=0.3)
     plt.xlabel("year")
     plt.ylabel("total_customers")
-    plt.title("Changes in Total No. of Customers")
+    plt.title("Bar Plot : Changes in Total No. of Customers")
     plt.savefig(img, format='png')
     img.seek(0)
 
@@ -188,13 +189,13 @@ def areachart():
     img = io.BytesIO()
 
     x = ["FY-2015","FY-2016","FY-2017"]
-    y = [mean_2015,mean_2016,mean_2017]
+    y1 = [mean_2015,mean_2016,mean_2017]
+    y2 = [median_2015, median_2016, median_2017]
 
-    plt.fill_between(x, y)
-    plt.title("Mean Revenue 2015-17")
+    plt.stackplot(x, y1, y2, labels=['Mean','Median'])
+    plt.title("Area Graph : Mean v/s Median Revenue 2015-17")
     plt.savefig(img, format='png')
     img.seek(0)
-
     plot_url3 = base64.b64encode(img.getvalue()).decode()
 
     return '<img src="data:image/png;base64,{}">'.format(plot_url3)
