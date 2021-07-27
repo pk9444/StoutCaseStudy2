@@ -1,5 +1,5 @@
 # Stout Case Study 2
-Analyzing and Visualizing financial data
+Analyzing and Visualizing financial data as a Flask-based web application.
 
 ## README 
 
@@ -7,3 +7,4 @@ Analyzing and Visualizing financial data
 - run `app.py` file 
 - open in your favorite browser
 - Explore the Analysis of the financial dataset, visualizations and interesting observations 
+- If any issues, viewing the graphs, please keep refreshing the page
