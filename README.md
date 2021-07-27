@@ -1,5 +1,5 @@
 # Stout Case Study 2
-Analyzing and Visualizing financial data
+Analyzing and Visualizing financial data as a Flask-based web application.
 
 ## README 
 
