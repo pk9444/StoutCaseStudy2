@@ -1,16 +1,17 @@
-import json
+
 
 from flask import Flask, render_template, request, redirect, url_for
 import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from flask_googlecharts import GoogleCharts
 import io
 import base64
 
 app = Flask(__name__)
-charts = GoogleCharts(app)
+
 
 # File Reading
 path = r'D:\pycharm\projects\StoutCaseStudy2\datasets\casestudy.csv'
@@ -27,6 +28,8 @@ median_2016 = dataframe_2015['net_revenue'].median()
 
 mean_2017 = dataframe_2017['net_revenue'].mean()
 median_2017 = dataframe_2015['net_revenue'].median()
+
+
 
 
 def get_total_revenue(year):
@@ -51,8 +54,8 @@ new_customers_count_2016 = (len(dataframe_2016.index) - len(dataframe_2015))
 lost_customers_count_2016 = (len(dataframe_2015.index) - len(dataframe_2016))
 
 #do the same from 2016 to 2017
-new_customers_count_2017 = (len(dataframe_2016.index) + len(dataframe_2017)) + (len(new_customers_2016_17.index) - len(dataframe_2016.index))
-lost_customers_count_2017 = (len(dataframe_2016.index) + len(dataframe_2017)) + (len(new_customers_2016_17.index) - len(dataframe_2017.index))
+new_customers_count_2017 = (len(dataframe_2017.index) - len(dataframe_2016))
+lost_customers_count_2017 = (len(dataframe_2016.index) - len(dataframe_2017))
 
 new_customers_2015_16.drop(new_customers_2015_16.loc[new_customers_2015_16['year']==2015].index, inplace=True)
 new_customers_2016_17.drop(new_customers_2016_17.loc[new_customers_2016_17['year']==2016].index, inplace=True)
@@ -184,21 +187,10 @@ def bargraph():
 
     return '<img src="data:image/png;base64,{}">'.format(plot_url2)
 
-@app.route('/areaChart')
-def areachart():
-    img = io.BytesIO()
+@app.route('/observations')
+def observations():
 
-    x = ["FY-2015","FY-2016","FY-2017"]
-    y1 = [mean_2015,mean_2016,mean_2017]
-    y2 = [median_2015, median_2016, median_2017]
-
-    plt.stackplot(x, y1, y2, labels=['Mean','Median'])
-    plt.title("Area Graph : Mean v/s Median Revenue 2015-17")
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plot_url3 = base64.b64encode(img.getvalue()).decode()
-
-    return '<img src="data:image/png;base64,{}">'.format(plot_url3)
+    return render_template('observations.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
