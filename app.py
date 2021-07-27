@@ -169,7 +169,7 @@ def bargraph():
     year = list(data.keys())
     customers = list(data.values())
 
-    fig= plt.figure(figsize=(5, 4))
+    fig= plt.figure(figsize=(5, 3))
 
     # creating the bar plot
     plt.barh(year, customers, color='maroon',align='center', height=0.3)
