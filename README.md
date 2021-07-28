@@ -1,6 +1,6 @@
 # Stout Case Study 2
 
-### Outline 
+## Outline 
 
 Analyzing and Visualizing financial data from FY 2015-17 and deploying the implementation Flask-based web application.
 
