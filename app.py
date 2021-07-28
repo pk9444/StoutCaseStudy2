@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 
 # File Reading
-path = r'D:\pycharm\projects\StoutCaseStudy2\datasets\casestudy.csv'
+path = r'absolute path to csv file'
 dataframe = pd.read_csv(path) # read all the files into a dataframe
 dataframe_2015 = dataframe[dataframe["year"]==2015]
 dataframe_2016 = dataframe[dataframe["year"]==2016]
@@ -177,8 +177,8 @@ def bargraph():
 
     # creating the bar plot
     plt.barh(year, customers, color='maroon',align='center', height=0.3)
-    plt.xlabel("year")
-    plt.ylabel("total_customers")
+    plt.xlabel("total_customers")
+    #plt.ylabel("total_customers")
     plt.title("Bar Plot : Changes in Total No. of Customers")
     plt.savefig(img, format='png')
     img.seek(0)
