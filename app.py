@@ -1,5 +1,4 @@
-
-
+#import all libraries
 from flask import Flask, render_template, request, redirect, url_for
 import numpy as np
 import pandas as pd
@@ -10,16 +9,20 @@ import matplotlib.pyplot as plt
 import io
 import base64
 
+# instantiate flask app object
 app = Flask(__name__)
 
 
-# File Reading
+# Read file in a pandas dataframe
 path = r'absolute path to csv file'
-dataframe = pd.read_csv(path) # read all the files into a dataframe
+dataframe = pd.read_csv(path)
+
+# Separate the data yearly - we need them records for each year in a separate dataframe for better data analysis
 dataframe_2015 = dataframe[dataframe["year"]==2015]
 dataframe_2016 = dataframe[dataframe["year"]==2016]
 dataframe_2017 = dataframe[dataframe["year"]==2017]
 
+# Compute mean and median for each year
 mean_2015 = dataframe_2015['net_revenue'].mean()
 median_2015 = dataframe_2015['net_revenue'].mean()
 
@@ -30,15 +33,20 @@ mean_2017 = dataframe_2017['net_revenue'].mean()
 median_2017 = dataframe_2015['net_revenue'].median()
 
 
-
-
+'''
+get_total_revenue() 
+@:param year - the year for which the revenue is to be computed 
+@:return total revenue for that year
+'''
 def get_total_revenue(year):
     filtered_data = dataframe[dataframe["year"] == year]
     return int(filtered_data['net_revenue'].sum())
 
-#combining the two consecutive year data
+# combining the two consecutive year dataframe
+# (2015 + 2016) and (2016 + 2017)
 dataframe_2015_16 = dataframe_2015.append(dataframe_2016)
 dataframe_2016_17 = dataframe_2016.append(dataframe_2017)
+
 
 # Compute Revenues from new customers in 2016
 # From the combined 2015-16, remove duplicate values and drop rows with year = "2015
@@ -69,6 +77,7 @@ current_revenue_2017 = new_customers_2016_17['net_revenue'].sum()
 def index():
     return render_template('index.html')
 
+# Route for the page of 2015
 @app.route('/output15',methods=['GET'])
 def year2015():
 
@@ -93,6 +102,7 @@ def year2015():
 
     return "<xmp>"  "\n" + "FY 2015 :\n" + out + "\n" + " </xmp> "
 
+# Route for the page of 2016
 @app.route('/output16',methods=['GET'])
 def year2016():
 
@@ -111,6 +121,7 @@ def year2016():
 
     return "<xmp>"  "\n" + "FY 2016 : \n" + out + "\n" + " </xmp> "
 
+# Route for the page of 2017
 @app.route('/output17.html',methods=['GET'])
 def year2017():
 
@@ -137,11 +148,16 @@ def year2017():
     return "<xmp>"  "\n" + "FY 2017 : \n" + out + "\n" + " </xmp> "
 
 
+# Route for the page of visualizations
 @app.route('/visualizations')
 def visualizations():
     return render_template('visualizations.html')
 
+# store the total revenue in a global variable which can be used for further processing
 total = get_total_revenue(2015) + get_total_revenue(2016) + get_total_revenue(2017)
+
+# Route for the Pie Chart - Matplotlib visualization
+# We will route the pie chart inside HTML frame in the visualizations.html page
 @app.route('/piechart')
 def piechart():
     img = io.BytesIO()
@@ -164,7 +180,8 @@ def piechart():
     #return render_template('piechart.html',data=data)
     return '<img src="data:image/png;base64,{}">'.format(plot_url)
 
-
+# Route for the Bar Graph - Matplotlib visualization
+# We will also route the Bar Graph inside HTML frame in the visualizations.html page
 @app.route('/bargraph')
 def bargraph():
     img = io.BytesIO()
@@ -187,11 +204,14 @@ def bargraph():
 
     return '<img src="data:image/png;base64,{}">'.format(plot_url2)
 
+# Route for the Observations of the Matplotlib visualizations
+# We will route the observations text data inside HTML frame in the visualizations.html page along with pie chart and bar graph
 @app.route('/observations')
 def observations():
 
     return render_template('observations.html')
 
+# Driver Function
 if __name__ == '__main__':
     app.run(debug=True)
 
